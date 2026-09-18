@@ -1,97 +1,238 @@
-<!DOCTYPE html>
-<html lang="si">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Radika's Kids World - පුංචි පැටවුන්ගේ ලෝකය</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+<p class="text-xs font-bold text-amber-600 dark:text-amber-400 mt-1 mb-3">
+                            ${king.era}
+                        </p>
+                        <p class="text-slate-600 dark:text-slate-300 text-sm line-clamp-3 leading-relaxed">
+                            ${king.shortDesc}
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                        <span class="text-xs font-bold text-brandOrange group-hover:underline flex items-center gap-1">
+                            වැඩිදුර තොරතුරු <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
-    <!-- Header Section -->
-    <header>
-        <div class="logo">
-            <h1>🎈 Radika's Kids World 🎈</h1>
-            <p>පුංචි යාළුවන්ට එකතු වෙලා විනෝදයෙන් ඉගෙනගන්න හොඳම තැන!</p>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="#alphabet">අකුරු (ABC)</a></li>
-                <li><a href="#animals">සතුන් (Animals)</a></li>
-                <li><a href="#math">ගණන් (Math)</a></li>
-                <li><a href="#drawing">චිත්‍ර (Drawing)</a></li>
-            </ul>
-        </nav>
-    </header>
+        // Search / Filter Kings
+        function filterKings() {
+            const query = document.getElementById('kingSearchInput').value.toLowerCase().trim();
+            const filtered = kingsData.filter(king => 
+                king.name.toLowerCase().includes(query) || 
+                king.era.toLowerCase().includes(query) ||
+                king.shortDesc.toLowerCase().includes(query)
+            );
+            renderKingsGrid(filtered);
+        }
 
-    <!-- Main Content -->
-    <main>
-        
-        <!-- Alphabet Section -->
-        <section id="alphabet" class="card-section">
-            <h2>🔤 ABC අකුරු ඉගෙනගනිමු</h2>
-            <div class="alphabet-grid" id="alphabetGrid">
-                <!-- JavaScript මගින් අකුරු කාඩ්පත් මෙතැනට එකතු වේ -->
-            </div>
-        </section>
+        // Open King Detail Modal
+        function openKingModal(id) {
+            const king = kingsData.find(k => k.id === id);
+            if (!king) return;
 
-        <!-- Animals Section -->
-        <section id="animals" class="card-section">
-            <h2>🦁 සතුන් අඳුනාගනිමු</h2>
-            <div class="animal-grid">
-                <div class="animal-card" onclick="playSound('lion')">
-                    <span class="emoji">🦁</span>
-                    <h3>සිංහයා (Lion)</h3>
+            const modal = document.getElementById('kingModal');
+            const modalContent = document.getElementById('modalContent');
+            const modalBody = document.getElementById('modalBody');
+
+            modalBody.innerHTML = `
+                <div class="text-center mb-6">
+                    <div class="w-24 h-24 mx-auto mb-3">
+                        ${getKingCrownSvg(king.crownStyle, '')}
+                    </div>
+                    <span class="bg-amber-100 dark:bg-slate-700 text-amber-800 dark:text-amber-300 text-xs font-black px-3 py-1 rounded-full uppercase">
+                        ${king.era}
+                    </span>
+                    <h2 class="text-3xl font-black text-slate-900 dark:text-white mt-2">
+                        ${king.name}
+                    </h2>
                 </div>
-                <div class="animal-card" onclick="playSound('elephant')">
-                    <span class="emoji">🐘</span>
-                    <h3>අලියා (Elephant)</h3>
+
+                <div class="space-y-6">
+                    <div class="bg-amber-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-amber-200 dark:border-slate-600">
+                        <h4 class="font-extrabold text-brandOrange text-base mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> විස්තරය
+                        </h4>
+                        <p class="text-slate-700 dark:text-slate-200 leading-relaxed text-sm sm:text-base">
+                            ${king.details}
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="font-extrabold text-slate-900 dark:text-white text-base mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-star text-brandYellow"></i> ශ්‍රේෂ්ඨ මෙහෙවර සහ කාර්යයන්
+                        </h4>
+                        <ul class="space-y-2">
+                            ${king.achievements.map(ach => `
+                                <li class="flex items-start gap-3 bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-medium">
+                                    <span class="text-brandGreen text-lg">✔</span>
+                                    <span class="text-slate-800 dark:text-slate-200">${ach}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+
+                    <div class="text-center pt-2">
+                        <button onclick="speakText('${king.name}. ${king.shortDesc} ${king.details}')" class="bg-brandBlue hover:bg-blue-600 text-white font-extrabold px-6 py-3 rounded-2xl kids-button-shadow inline-flex items-center gap-2 text-sm">
+                            <i class="fa-solid fa-volume-high"></i> හඬින් සවන්දෙන්න
+                        </button>
+                    </div>
                 </div>
-                <div class="animal-card" onclick="playSound('dog')">
-                    <span class="emoji">🐶</span>
-                    <h3>බල්ලා (Dog)</h3>
-                </div>
-                <div class="animal-card" onclick="playSound('cat')">
-                    <span class="emoji">🐱</span>
-                    <h3>පූසා (Cat)</h3>
-                </div>
-            </div>
-        </section>
+            `;
 
-        <!-- Math Section -->
-        <section id="math" class="card-section">
-            <h2>🔢 පුංචි ගණන් ගැටලු</h2>
-            <div class="quiz-container">
-                <div id="question" class="question">2 + 3 = ?</div>
-                <div class="options">
-                    <button class="opt-btn" onclick="checkAnswer(3)">3</button>
-                    <button class="opt-btn" onclick="checkAnswer(5)">5</button>
-                    <button class="opt-btn" onclick="checkAnswer(6)">6</button>
-                </div>
-                <p id="feedback" class="feedback"></p>
-                <p class="score-board">ලකුණු: <span id="score">0</span></p>
-            </div>
-        </section>
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
 
-        <!-- Drawing Canvas Section -->
-        <section id="drawing" class="card-section">
-            <h2>🎨 ලස්සන චිත්‍ර අඳිමු</h2>
-            <div class="canvas-controls">
-                <input type="color" id="colorPicker" value="#ff0000">
-                <input type="range" id="brushSize" min="2" max="20" value="5">
-                <button onclick="clearCanvas()">මකන්න (Clear)</button>
-            </div>
-            <canvas id="paintCanvas" width="400" height="250"></canvas>
-        </section>
+        // Close King Detail Modal
+        function closeKingModal() {
+            const modal = document.getElementById('kingModal');
+            const modalContent = document.getElementById('modalContent');
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            window.speechSynthesis.cancel();
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
 
-    </main>
+        // Quiz Logic Variables
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let answered = false;
 
-    <!-- Footer -->
-    <footer>
-        <p>Created with ❤️ by <strong>Radika</strong> | Kids Educational Website</p>
-    </footer>
+        function loadQuestion() {
+            answered = false;
+            const q = quizQuestions[currentQuestionIdx];
+            document.getElementById('quizProgress').textContent = `ප්‍රශ්නය ${currentQuestionIdx + 1} / ${quizQuestions.length}`;
+            document.getElementById('quizQuestion').textContent = q.question;
+            document.getElementById('nextBtn').classList.add('hidden');
+            
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = "hidden text-center p-4 rounded-xl font-bold text-lg";
 
-    <script src="script.js"></script>
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold p-4 rounded-2xl text-left transition-all kids-button-shadow flex items-center gap-3";
+                btn.onclick = () => checkAnswer(idx, btn);
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-full bg-purple-500/50 flex items-center justify-center text-xs font-black">${idx + 1}</span>
+                    <span>${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btnElement) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizQuestions[currentQuestionIdx];
+            const options = document.getElementById('quizOptions').children;
+            const feedback = document.getElementById('quizFeedback');
+
+            if (selectedIdx === q.answer) {
+                score += 20;
+                document.getElementById('quizScore').textContent = `ලකුණු: ${score}`;
+                btnElement.classList.remove('bg-white/10', 'hover:bg-white/20');
+                btnElement.classList.add('bg-emerald-500', 'border-emerald-300');
+                
+                feedback.textContent = "🎉 නිවැරදියි! ඉතා විශිෂ්ටයි!";
+                feedback.classList.add('bg-emerald-500/30', 'text-emerald-200', 'border', 'border-emerald-400');
+                feedback.classList.remove('hidden');
+
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.8 }
+                });
+            } else {
+                btnElement.classList.remove('bg-white/10', 'hover:bg-white/20');
+                btnElement.classList.add('bg-rose-600', 'border-rose-400');
+                
+                options[q.answer].classList.remove('bg-white/10');
+                options[q.answer].classList.add('bg-emerald-500', 'border-emerald-300');
+
+                feedback.textContent = "❌ පිළිතුර වැරදියි! නිවැරදි පිළිතුර කොළ පැහැයෙන් දක්වා ඇත.";
+                feedback.classList.add('bg-rose-500/30', 'text-rose-200', 'border', 'border-rose-400');
+                feedback.classList.remove('hidden');
+            }
+
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showQuizComplete();
+            }
+        }
+
+        function showQuizComplete() {
+            document.getElementById('quizCard').classList.add('hidden');
+            document.getElementById('quizCompleteScreen').classList.remove('hidden');
+            document.getElementById('finalScoreText').textContent = `ඔබගේ මුළු ලකුණු සංඛ්‍යාව: ${score} / 100`;
+            
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function restartQuiz() {
+            currentQuestionIdx = 0;
+            score = 0;
+            document.getElementById('quizScore').textContent = `ලකුණු: 0`;
+            document.getElementById('quizCompleteScreen').classList.add('hidden');
+            document.getElementById('quizCard').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        // Theme Switcher (Light/Dark Mode)
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const themeIcon = document.getElementById('themeIcon');
+            if (isDark) {
+                themeIcon.className = "fa-solid fa-sun text-lg text-amber-300";
+            } else {
+                themeIcon.className = "fa-solid fa-moon text-lg";
+            }
+        }
+
+        // Speech Synthesis / Text to Speech (TTS)
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'si-LK';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("ඔබගේ බ්‍රවුසරය හඬ පහසුකමට සහය නොදක්වයි.");
+            }
+        }
+
+        function toggleAudioSpeech() {
+            const mainHeaderSpeech = "ආයුබෝවන් පුංචි යහළුවනේ! R plus education වෙතින් ලංකාවේ අභිමානවත් ප්‍රසිද්ධ රජවරුන් ගැන ඉගෙන ගනිමු!";
+            speakText(mainHeaderSpeech);
+        }
+
+        // Initialize
+        window.onload = () => {
+            renderKingsGrid();
+            loadQuestion();
+        };
+    </script>
 </body>
 </html>
