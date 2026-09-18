@@ -1,109 +1,134 @@
-// Load Alphabet Cards Dynamically
-const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-const alphabetGrid = document.getElementById("alphabetGrid");
+<script>
+        // Quiz Logic Variables
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let answered = false;
 
-alphabet.forEach(letter => {
-    const card = document.createElement("div");
-    card.className = "letter-card";
-    card.innerText = letter;
-    card.onclick = () => speakText(letter);
-    alphabetGrid.appendChild(card);
-});
+        function loadQuestion() {
+            answered = false;
+            const q = quizQuestions[currentQuestionIdx];
+            document.getElementById('quizProgress').textContent = `ප්‍රශ්නය ${currentQuestionIdx + 1} / ${quizQuestions.length}`;
+            document.getElementById('quizQuestion').textContent = q.question;
+            document.getElementById('nextBtn').classList.add('hidden');
+            
+            const feedback = document.getElementById('quizFeedback');
+            feedback.className = "hidden text-center p-4 rounded-xl font-bold text-lg";
 
-// Text to Speech Function (Browser Feature)
-function speakText(text) {
-    const speech = new SpeechSynthesisUtterance();
-    speech.text = text;
-    speech.lang = "en-US";
-    window.speechSynthesis.speak(speech);
-}
+            const optionsContainer = document.getElementById('quizOptions');
+            optionsContainer.innerHTML = '';
 
-// Animal Sound Simulation using Speech Synthesis
-function playSound(animal) {
-    let text = "";
-    if (animal === 'lion') text = "Roar! I am a Lion.";
-    if (animal === 'elephant') text = "Trumpet! I am an Elephant.";
-    if (animal === 'dog') text = "Woof Woof! I am a Dog.";
-    if (animal === 'cat') text = "Meow Meow! I am a Cat.";
-    
-    speakText(text);
-}
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold p-4 rounded-2xl text-left transition-all kids-button-shadow flex items-center gap-3";
+                btn.onclick = () => checkAnswer(idx, btn);
+                btn.innerHTML = `
+                    <span class="w-8 h-8 rounded-full bg-purple-500/50 flex items-center justify-center text-xs font-black">${idx + 1}</span>
+                    <span>${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+        }
 
-// Simple Math Quiz Logic
-let currentScore = 0;
-let correctAnswer = 5;
+        function checkAnswer(selectedIdx, btnElement) {
+            if (answered) return;
+            answered = true;
 
-function checkAnswer(selectedOption) {
-    const feedback = document.getElementById("feedback");
-    const scoreDisplay = document.getElementById("score");
+            const q = quizQuestions[currentQuestionIdx];
+            const options = document.getElementById('quizOptions').children;
+            const feedback = document.getElementById('quizFeedback');
 
-    if (selectedOption === correctAnswer) {
-        feedback.innerText = "🎈 නිවැරදියි! ගොඩක් හොඳයි!";
-        feedback.style.color = "green";
-        currentScore += 10;
-        scoreDisplay.innerText = currentScore;
-        setTimeout(generateNewQuestion, 1500);
-    } else {
-        feedback.innerText = "❌ වැරදියි! නැවත උත්සාහ කරන්න.";
-        feedback.style.color = "red";
-    }
-}
+            if (selectedIdx === q.answer) {
+                score += 20;
+                document.getElementById('quizScore').textContent = `ලකුණු: ${score}`;
+                btnElement.classList.remove('bg-white/10', 'hover:bg-white/20');
+                btnElement.classList.add('bg-emerald-500', 'border-emerald-300');
+                
+                feedback.textContent = "🎉 නිවැරදියි! ඉතා විශිෂ්ටයි!";
+                feedback.classList.add('bg-emerald-500/30', 'text-emerald-200', 'border', 'border-emerald-400');
+                feedback.classList.remove('hidden');
 
-function generateNewQuestion() {
-    const num1 = Math.floor(Math.random() * 5) + 1;
-    const num2 = Math.floor(Math.random() * 5) + 1;
-    correctAnswer = num1 + num2;
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { y: 0.8 }
+                });
+            } else {
+                btnElement.classList.remove('bg-white/10', 'hover:bg-white/20');
+                btnElement.classList.add('bg-rose-600', 'border-rose-400');
+                
+                options[q.answer].classList.remove('bg-white/10');
+                options[q.answer].classList.add('bg-emerald-500', 'border-emerald-300');
 
-    document.getElementById("question").innerText = `${num1} + ${num2} = ?`;
-    document.getElementById("feedback").innerText = "";
+                feedback.textContent = "❌ පිළිතුර වැරදියි! නිවැරදි පිළිතුර කොළ පැහැයෙන් දක්වා ඇත.";
+                feedback.classList.add('bg-rose-500/30', 'text-rose-200', 'border', 'border-rose-400');
+                feedback.classList.remove('hidden');
+            }
 
-    const optionsContainer = document.querySelector(".options");
-    optionsContainer.innerHTML = "";
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
 
-    let answers = [correctAnswer, correctAnswer + 1, Math.max(1, correctAnswer - 1)];
-    answers = answers.sort(() => Math.random() - 0.5);
+        function nextQuestion() {
+            currentQuestionIdx++;
+            if (currentQuestionIdx < quizQuestions.length) {
+                loadQuestion();
+            } else {
+                showQuizComplete();
+            }
+        }
 
-    answers.forEach(ans => {
-        const btn = document.createElement("button");
-        btn.className = "opt-btn";
-        btn.innerText = ans;
-        btn.onclick = () => checkAnswer(ans);
-        optionsContainer.appendChild(btn);
-    });
-}
+        function showQuizComplete() {
+            document.getElementById('quizCard').classList.add('hidden');
+            document.getElementById('quizCompleteScreen').classList.remove('hidden');
+            document.getElementById('finalScoreText').textContent = `ඔබගේ මුළු ලකුණු සංඛ්‍යාව: ${score} / 100`;
+            
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                origin: { y: 0.6 }
+            });
+        }
 
-// Canvas Drawing Feature
-const canvas = document.getElementById("paintCanvas");
-const ctx = canvas.getContext("2d");
-let isDrawing = false;
+        function restartQuiz() {
+            currentQuestionIdx = 0;
+            score = 0;
+            document.getElementById('quizScore').textContent = `ලකුණු: 0`;
+            document.getElementById('quizCompleteScreen').classList.add('hidden');
+            document.getElementById('quizCard').classList.remove('hidden');
+            loadQuestion();
+        }
 
-canvas.addEventListener("mousedown", () => isDrawing = true);
-canvas.addEventListener("mouseup", () => {
-    isDrawing = false;
-    ctx.beginPath();
-});
-canvas.addEventListener("mousemove", draw);
+        // Theme Switcher (Light/Dark Mode)
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const themeIcon = document.getElementById('themeIcon');
+            if (isDark) {
+                themeIcon.className = "fa-solid fa-sun text-lg text-amber-300";
+            } else {
+                themeIcon.className = "fa-solid fa-moon text-lg";
+            }
+        }
 
-function draw(event) {
-    if (!isDrawing) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+        // Speech Synthesis / Text to Speech (TTS)
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'si-LK';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("ඔබගේ බ්‍රවුසරය හඬ පහසුකමට සහය නොදක්වයි.");
+            }
+        }
 
-    const color = document.getElementById("colorPicker").value;
-    const size = document.getElementById("brushSize").value;
+        function toggleAudioSpeech() {
+            const mainHeaderSpeech = "ආයුබෝවන් පුංචි යහළුවනේ! R plus education වෙතින් ලංකාවේ අභිමානවත් ප්‍රසිද්ධ රජවරුන් ගැන ඉගෙන ගනිමු!";
+            speakText(mainHeaderSpeech);
+        }
 
-    ctx.lineWidth = size;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = color;
-
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-}
-
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+        // Initialize
+        window.onload = () => {
+            renderKingsGrid();
+            loadQuestion();
+        };
+</script>
