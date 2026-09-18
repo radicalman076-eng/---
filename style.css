@@ -1,28 +1,24 @@
-<style>
-  /* Custom Tailwind configuration & styling overrides */
-  :root {
-    --brand-orange: #f97316;
-    --brand-yellow: #eab308;
-    --brand-green: #10b981;
-    --brand-blue: #3b82f6;
-  }
-
-  /* Utility classes for playful button shadows */
-  .kids-button-shadow {
-    box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.2);
-    transition: all 0.1s ease-in-out;
-  }
-
-  .kids-button-shadow:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
-  }
-
-  /* Line clamp fallback */
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-</style>
+body {
+    font-family: 'Noto Sans Sinhala', 'Fredoka', sans-serif;
+}
+.kids-card-shadow {
+    box-shadow: 0 10px 0px 0px rgba(0, 0, 0, 0.12);
+}
+.kids-button-shadow {
+    box-shadow: 0 6px 0px 0px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s ease;
+}
+.kids-button-shadow:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0px 0px rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar {
+    width: 12px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+    background: #FF6B35;
+    border-radius: 10px;
+}
